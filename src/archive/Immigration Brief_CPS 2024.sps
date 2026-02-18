@@ -1,4 +1,4 @@
-﻿* Encoding: UTF-8.
+* Encoding: UTF-8. 
 PRESERVE.				
 SET DECIMAL DOT.				
 
