@@ -1,5 +1,141 @@
 ---
-title: "jobs_report_notebook"
-format: html
+title: "Jobs Report Development Notebook"
+date: "Published on `r format(Sys.time(), '%m-%d-%y')`"
+format:
+  html:
+    toc: true
+    toc-location: left
+    toc-depth: 5
+    page-layout: full
+fig-cap-location: top
+editor:
+  markdown:
+    wrap: 72
+execute: 
+  echo: true
+  output: true
 ---
+
+# Load Packages to use 
+
+To input data from ipums, we're going to use the ipumsr package
+
+For packages that aren't yet installed:
+```{r}
+#install.packages("ipumsr")
+```
+
+Load packages
+```{r}
+#| output: false
+library("tidyverse")
+library("merced.clc")
+library("ipumsr")
+```
+
+The ipums API allows us to talk directly to the ipums data source using an API key. More 
+information [here](https://developer.ipums.org/docs/v2/get-started/).
+
+Separately, there is an R package called `ipumsr` [here](https://tech.popdata.org/ipumsr/reference/set_ipums_api_key.html), which allows us to
+talk to the IPUMS api directly via R code in Rstudio.
+
+The ipumsr package requires an API to be set. Once an API key has been created for your 
+IPUMS account, you want to save it to your local `.Renviron` file.
+
+:::{.callout-warning}
+LUKE NEEDS TO FIGURE OUT SYS.SETENV LATER
+:::
+
+First, we'll save our api key to the .Renviron like this.
+```{r}
+# Sys.setenv(ipums_api_key = "alasdf;lkjasdfl;kj2q12l;kjas;lf")
+```
+
+Then we tell the ipumsr package to use that key when talking to the ipums API data source. You should
+only have to run this command the first time you set up.
+```{r}
+# ipumsr:::set_ipums_api_key(Sys.getenv("ipums_api_key"),
+#                            save = TRUE)
+```
+
+
+# Downloading ACS Data
+
+To download ACS data, you need to:
+
+1. Specify a data collection (e.g. "CPS")
+
+2. Specify a Description for your data download (e.g. "Jobs report feb 2020")
+
+3. Specify the variables within the dataset that you want to download (e.g. "OCC" for Occupation code)
+
+4. Specify a data sample (e.g. "cps2025_12s" for the december 2025 ipums cps data)
+
+## Specify a data collection
+```{r}
+my_data_collection = "cps"
+```
+
+## Specify a Description
+```{r}
+my_data_description = "Jobs report feb 2020"
+```
+
+## Specify the variables within the dataset
+```{r}
+#| output: true
+my_ipums_vars <- tribble(~`IPUMS code`, ~Description,
+        "CITIZEN", "CITIZEN reports the citizenship status of foreign-born persons",
+        "RACE", "Racial categories in the CPS")
+
+my_ipums_vars %>% 
+  arrange(`IPUMS code`) %>% 
+  merced.clc::dt_table(filter = F,
+                       search = F,
+                       row_nums = F,
+                       page = T)
+```
+
+## Specify a data sample
+```{r}
+my_data_samples = "cps2025_12s"
+```
+
+
+## Making an IPUMS API Data Request
+
+### Creating an API request
+
+Use the `ipumsr::define_extract_micro` function to define the data request that we're 
+going to send to the IPUMS API.
+```{r, download ipums extract}
+#| eval: false
+ipums_request <- ipumsr::define_extract_micro(collection = my_data_collection,
+                                              description = my_data_description,
+                                              variables = my_ipums_vars$`IPUMS code`,
+                                              samples = my_data_samples)
+```
+
+
+### Submitting an API Request
+```{r}
+#| eval: false
+ipums_extract <- ipumsr::submit_extract(ipums_request)
+```
+
+
+### Downloading an API Request
+```{r}
+#| eval: false
+downloadable_extract <- ipumsr::wait_for_extract(ipums_extract)
+path_to_data_files <- ipumsr::download_extract(downloadable_extract,
+                                               download_dir = here::here("data"))
+```
+
+
+
+
+
+
+
 
