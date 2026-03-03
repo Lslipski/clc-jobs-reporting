@@ -22,7 +22,8 @@ To input data from ipums, we're going to use the ipumsr package
 
 For packages that aren't yet installed:
 ```{r}
-#install.packages("ipumsr")
+#|eval: false
+install.packages("ipumsr")
 ```
 
 Load packages
@@ -48,14 +49,16 @@ LUKE NEEDS TO FIGURE OUT SYS.SETENV LATER
 
 First, we'll save our api key to the .Renviron like this.
 ```{r}
+#|eval: false
 # Sys.setenv(ipums_api_key = "alasdf;lkjasdfl;kj2q12l;kjas;lf")
 ```
 
 Then we tell the ipumsr package to use that key when talking to the ipums API data source. You should
 only have to run this command the first time you set up.
 ```{r}
-# ipumsr:::set_ipums_api_key(Sys.getenv("ipums_api_key"),
-#                            save = TRUE)
+#|eval: false
+ipumsr:::set_ipums_api_key(Sys.getenv("ipums_api_key"),
+                            save = TRUE)
 ```
 
 
